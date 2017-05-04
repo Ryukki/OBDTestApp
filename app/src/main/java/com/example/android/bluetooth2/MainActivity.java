@@ -41,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         textPanel = (EditText)findViewById(R.id.editText);
         String text = "ODB\ntest\napplication";
+        checkBTPermission();
         textPanel.setText(text);
         setupODB();
         text = "ODB setup\nsuccessful";
@@ -90,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
         alertDialog.show();
     }*/
 
-    public boolean checkLocationPermission() {
+    public boolean checkBTPermission() {
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.BLUETOOTH)
                 != PackageManager.PERMISSION_GRANTED) {
