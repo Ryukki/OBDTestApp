@@ -4,11 +4,10 @@ import android.Manifest;
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothSocket;
 import android.content.DialogInterface;
-import android.content.pm.PackageManager;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -33,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
     private String deviceAddress;
     private BluetoothSocket socket;
     private EditText textPanel;
-    public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
+    public static final int REQUEST_ENABLE_BT = 99;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,85 +40,10 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         textPanel = (EditText)findViewById(R.id.editText);
         String text = "ODB\ntest\napplication";
-        checkBTPermission();
         textPanel.setText(text);
         setupODB();
         text = "ODB setup\nsuccessful";
         textPanel.setText(text);
-        connect_bt();
-        text = "connection\nsuccessful";
-        textPanel.setText(text);
-        test_odb();
-    }
-
-    /*@RequiresApi(api = Build.VERSION_CODES.ECLAIR)
-    public void chooseDevice()
-    {
-
-        ArrayList deviceStrs = new ArrayList();
-        final ArrayList devices = new ArrayList();
-
-        BluetoothAdapter btAdapter = BluetoothAdapter.getDefaultAdapter();
-        Set<BluetoothDevice> pairedDevices = btAdapter.getBondedDevices();
-        if (pairedDevices.size() > 0)
-        {
-            for (BluetoothDevice device : pairedDevices)
-            {
-                deviceStrs.add(device.getName() + "\n" + device.getAddress());
-                devices.add(device.getAddress());
-            }
-        }
-
-        // show list
-        final AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
-
-        ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.select_dialog_singlechoice,
-                deviceStrs.toArray(new String[deviceStrs.size()]));
-
-        alertDialog.setSingleChoiceItems(adapter, -1, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which)
-            {
-                dialog.dismiss();
-                int position = ((AlertDialog) dialog).getListView().getCheckedItemPosition();
-                deviceAddress = devices.get(position).toString() ;
-                // TODO save deviceAddress
-            }
-        });
-
-        alertDialog.setTitle("Choose Bluetooth device");
-        alertDialog.show();
-    }*/
-
-    public boolean checkBTPermission() {
-        if (ContextCompat.checkSelfPermission(this,
-                Manifest.permission.BLUETOOTH)
-                != PackageManager.PERMISSION_GRANTED) {
-
-            // Asking user if explanation is needed
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                    Manifest.permission.BLUETOOTH)) {
-
-                // Show an expanation to the user asynchronously -- don't block
-                // this thread waiting for the user's response! After the user
-                // sees the explanation, try again to request the permission.
-
-                //Prompt the user once explanation has been shown
-                ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.BLUETOOTH},
-                        MY_PERMISSIONS_REQUEST_LOCATION);
-
-
-            } else {
-                // No explanation needed, we can request the permission.
-                ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.BLUETOOTH},
-                        MY_PERMISSIONS_REQUEST_LOCATION);
-            }
-            return false;
-        } else {
-            return true;
-        }
     }
 
     private void setupODB() {
@@ -127,6 +51,16 @@ public class MainActivity extends AppCompatActivity {
         final ArrayList devices = new ArrayList();
 
         BluetoothAdapter btAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (btAdapter==null)
+        {
+
+        }
+
+        if (!btAdapter.isEnabled()) {
+            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+        }
+
         Set pairedDevices = btAdapter.getBondedDevices();
         if (pairedDevices.size() > 0)
         {
@@ -153,6 +87,12 @@ public class MainActivity extends AppCompatActivity {
                 int position = ((AlertDialog) dialog).getListView().getCheckedItemPosition();
                 deviceAddress = (String) deviceStrs.get(position);
                 Log.d("gping2","Picked: "+deviceAddress);
+
+
+                connect_bt();
+                String text = "connection\nsuccessful";
+                textPanel.setText(text);
+                test_odb();
             }
         });
 
@@ -163,12 +103,14 @@ public class MainActivity extends AppCompatActivity {
     private void connect_bt() {
         BluetoothAdapter btAdapter = BluetoothAdapter.getDefaultAdapter();
 
+        deviceAddress = deviceAddress.substring(deviceAddress.indexOf('\n') + 1);
         BluetoothDevice device = btAdapter.getRemoteDevice(deviceAddress);
 
         UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
         try {
             socket = device.createInsecureRfcommSocketToServiceRecord(uuid);
+            //socket = BluetoothManager.connect(device);
             socket.connect();
             Log.d("gping2","Connected: "+uuid);
         } catch (IOException e) {
