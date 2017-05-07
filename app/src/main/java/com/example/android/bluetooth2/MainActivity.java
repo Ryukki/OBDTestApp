@@ -88,7 +88,6 @@ public class MainActivity extends AppCompatActivity {
                 deviceAddress = (String) deviceStrs.get(position);
                 Log.d("gping2","Picked: "+deviceAddress);
 
-
                 connect_bt();
                 String text = "connection\nsuccessful";
                 textPanel.setText(text);
@@ -102,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void connect_bt() {
         BluetoothAdapter btAdapter = BluetoothAdapter.getDefaultAdapter();
-
+        btAdapter.cancelDiscovery();
         deviceAddress = deviceAddress.substring(deviceAddress.indexOf('\n') + 1);
         BluetoothDevice device = btAdapter.getRemoteDevice(deviceAddress);
 
