@@ -13,14 +13,14 @@ import java.io.IOException;
  * Created by Jakub on 08.05.2017.
  */
 
-public class asyncTaskClass extends AsyncTask {
+public class asyncTaskClass extends AsyncTask<Object, Object, Object> {
+    RPMCommand engineRpmCommand;
+    SpeedCommand speedCommand;
     @Override
-    protected Object[] doInBackground(Object[] params) {
-        Object[] results = new Object[3];
-        results[0] = params[0];
+    protected Object doInBackground(Object[] params) {
         BluetoothSocket socket = (BluetoothSocket)params[1];
-        RPMCommand engineRpmCommand = new RPMCommand();
-        SpeedCommand speedCommand = new SpeedCommand();
+        engineRpmCommand = new RPMCommand();
+        speedCommand = new SpeedCommand();
         try {
             engineRpmCommand.run(socket.getInputStream(), socket.getOutputStream());
             speedCommand.run(socket.getInputStream(), socket.getOutputStream());
@@ -29,15 +29,12 @@ public class asyncTaskClass extends AsyncTask {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        results[1] = engineRpmCommand;
-        results[2] = speedCommand;
-        return null;
+        return params[0];
     }
-
-    protected void onPostExecute(Object[] results) {
-        EditText textPanel = (EditText)results[0];
-        RPMCommand engineRpmCommand = (RPMCommand) results[1];
-        SpeedCommand speedCommand = (SpeedCommand)results[2];
+    @Override
+    protected void onPostExecute(Object results) {
+        //super.onPostExecute(results);
+        EditText textPanel = (EditText)results;
 
         String text = "RPM: " + engineRpmCommand.getFormattedResult()+ "\n"+
                 "Speed: " + speedCommand.getFormattedResult();
