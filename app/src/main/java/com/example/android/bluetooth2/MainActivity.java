@@ -142,20 +142,27 @@ public class MainActivity extends AppCompatActivity {
             RPMCommand engineRpmCommand = new RPMCommand();
             SpeedCommand speedCommand = new SpeedCommand();
             OilTempCommand oilTempCommand = new OilTempCommand();
+
             String text;
             while (!Thread.currentThread().isInterrupted())
             {
                 engineRpmCommand.run(socket.getInputStream(), socket.getOutputStream());
                 speedCommand.run(socket.getInputStream(), socket.getOutputStream());
-                oilTempCommand.run(socket.getInputStream(), socket.getOutputStream());
+                try {
+                //     oilTempCommand.run(socket.getInputStream(), socket.getOutputStream());
                 text =  "RPM: " + engineRpmCommand.getFormattedResult()+ "\n"+
                         "Speed: " + speedCommand.getFormattedResult() + "\n"+
-                        "Oil temp: " + oilTempCommand.getFormattedResult();
+                        "Oil temp: " ;
                 textPanel.setText(text);
                 // TODO handle commands result
                 Log.d("gping2", "RPM: " + engineRpmCommand.getFormattedResult());
                 //mAid.setText("RPM: " + engineRpmCommand.getFormattedResult());
                 Log.d("gping2", "Speed: " + speedCommand.getFormattedResult());
+
+                    } catch (UnableToConnectException e) {
+
+
+                }
             }
         } catch (MisunderstoodCommandException e) {
             Log.e("gping2", "MisunderstoodCommandException: "+e.toString());
