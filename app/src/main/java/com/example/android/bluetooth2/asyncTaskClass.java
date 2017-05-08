@@ -13,7 +13,7 @@ import java.io.IOException;
  * Created by Jakub on 08.05.2017.
  */
 
-public class asyncTaskClass extends AsyncTask<Object, Object, Object> {
+public class asyncTaskClass extends AsyncTask{
     RPMCommand engineRpmCommand;
     SpeedCommand speedCommand;
     @Override
