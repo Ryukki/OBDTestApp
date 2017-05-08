@@ -139,13 +139,15 @@ public class MainActivity extends AppCompatActivity {
 
             Toast.makeText(MainActivity.this, "ODB-II connected", Toast.LENGTH_SHORT).show();
 
-            RPMCommand engineRpmCommand = new RPMCommand();
-            SpeedCommand speedCommand = new SpeedCommand();
-            OilTempCommand oilTempCommand = new OilTempCommand();
+            //RPMCommand engineRpmCommand = new RPMCommand();
+            //SpeedCommand speedCommand = new SpeedCommand();
+            //OilTempCommand oilTempCommand = new OilTempCommand();
 
             String text;
             while (!Thread.currentThread().isInterrupted())
             {
+                new asyncTaskClass().execute(textPanel, socket);
+                /*
                 engineRpmCommand.run(socket.getInputStream(), socket.getOutputStream());
                 speedCommand.run(socket.getInputStream(), socket.getOutputStream());
                 try {
@@ -162,7 +164,7 @@ public class MainActivity extends AppCompatActivity {
                     } catch (UnableToConnectException e) {
 
 
-                }
+                }*/
             }
         } catch (MisunderstoodCommandException e) {
             Log.e("gping2", "MisunderstoodCommandException: "+e.toString());
